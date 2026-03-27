@@ -3,6 +3,9 @@ import axios from "axios";
 import { BrowserRouter as Router, Routes, Route, useNavigate } from "react-router-dom";
 import Dashboard from "./Dashboard";
 
+// 🔥 Backend URL from .env
+const BASE_URL = process.env.REACT_APP_API_URL;
+
 function Auth() {
   const [isLogin, setIsLogin] = useState(false);
   const navigate = useNavigate();
@@ -22,18 +25,23 @@ function Auth() {
 
     try {
       if (isLogin) {
-        const res = await axios.post("http://localhost:5000/api/users/login", {
-          email: form.email,
-          password: form.password
-        });
+        const res = await axios.post(
+          `${BASE_URL}/api/users/login`,
+          {
+            email: form.email,
+            password: form.password
+          }
+        );
 
         alert(res.data.message);
-
-        // ✅ redirect after login
         navigate("/dashboard");
 
       } else {
-        const res = await axios.post("http://localhost:5000/api/users/signup", form);
+        const res = await axios.post(
+          `${BASE_URL}/api/users/signup`,
+          form
+        );
+
         alert(res.data.message);
       }
     } catch (err) {
