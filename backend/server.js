@@ -1,4 +1,5 @@
 console.log("🚀 NEW SERVER FILE RUNNING");
+
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
@@ -11,8 +12,11 @@ const Item = require("./models/Item");
 
 const app = express();
 
+// ✅ CORS (allow frontend)
+app.use(cors({
+    origin: "*"
+}));
 
-app.use(cors());
 app.use(express.json());
 
 // ================= MULTER CONFIG =================
@@ -36,13 +40,13 @@ app.use("/uploads", express.static("uploads"));
 app.use("/api/users", userRoutes);
 
 // test route
-app.get("/direct", (req, res) => {
-    res.send("GET working");
+app.get("/", (req, res) => {
+    res.send("Backend is running 🚀");
 });
 
 // ================= ITEMS ROUTES =================
 
-// ✅ GET all items
+// GET all items
 app.get("/api/items", async (req, res) => {
     try {
         const items = await Item.find();
@@ -52,12 +56,9 @@ app.get("/api/items", async (req, res) => {
     }
 });
 
-// ✅ POST item with image
+// POST item with image
 app.post("/api/items", upload.single("image"), async (req, res) => {
     try {
-        console.log("BODY:", req.body);
-        console.log("FILE:", req.file);
-
         const { title, description, location } = req.body;
 
         const item = new Item({
@@ -76,11 +77,8 @@ app.post("/api/items", upload.single("image"), async (req, res) => {
     }
 });
 
-// ✅ DELETE item
+// DELETE item
 app.delete("/api/items/:id", async (req, res) => {
-    console.log("🔥 DELETE ROUTE HIT");   // VERY IMPORTANT
-    console.log("ID:", req.params.id);
-
     try {
         const deletedItem = await Item.findByIdAndDelete(req.params.id);
 
@@ -90,16 +88,21 @@ app.delete("/api/items/:id", async (req, res) => {
 
         res.json({ message: "Deleted ✅" });
     } catch (err) {
-        console.log(err);
         res.status(500).json({ error: err.message });
     }
 });
+
 // ================= DATABASE =================
-mongoose.connect("mongodb://127.0.0.1:27017/lostfound")
-    .then(() => console.log("MongoDB Connected"))
+
+// 🔥 USE ENV VARIABLE (NOT localhost)
+mongoose.connect(process.env.MONGO_URI)
+    .then(() => console.log("MongoDB Connected ✅"))
     .catch(err => console.log(err));
 
 // ================= SERVER =================
-app.listen(5000, () => {
-    console.log("Server running on port 5000");
+
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
 });
