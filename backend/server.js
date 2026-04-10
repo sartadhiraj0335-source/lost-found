@@ -1,108 +1,50 @@
-console.log("🚀 NEW SERVER FILE RUNNING");
-
 const express = require("express");
-const mongoose = require("mongoose");
-const cors = require("cors");
-const multer = require("multer");
-const path = require("path");
-require("dotenv").config();
+const router = express.Router();
 
-const userRoutes = require("./routes/userRoutes");
-const Item = require("./models/Item");
-
-const app = express();
-
-// ✅ CORS (allow frontend)
-app.use(cors({
-    origin: "*"
-}));
-
-app.use(express.json());
-
-// ================= MULTER CONFIG =================
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, "uploads/");
-    },
-    filename: (req, file, cb) => {
-        cb(null, Date.now() + path.extname(file.originalname));
-    }
-});
-
-const upload = multer({ storage });
-
-// serve uploaded images
-app.use("/uploads", express.static("uploads"));
-
-// ================= ROUTES =================
-
-// user routes
-app.use("/api/users", userRoutes);
-
-// test route
-app.get("/", (req, res) => {
-    res.send("Backend is running 🚀");
-});
-
-// ================= ITEMS ROUTES =================
-
-// GET all items
-app.get("/api/items", async (req, res) => {
+// ✅ Signup route
+router.post("/signup", async (req, res) => {
     try {
-        const items = await Item.find();
-        res.json(items);
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
-});
+        const { name, email, password } = req.body;
 
-// POST item with image
-app.post("/api/items", upload.single("image"), async (req, res) => {
-    try {
-        const { title, description, location } = req.body;
-
-        const item = new Item({
-            title,
-            description,
-            location,
-            image: req.file ? req.file.filename : null
-        });
-
-        await item.save();
-
-        res.json({ message: "Item added successfully ✅" });
-    } catch (err) {
-        console.log(err);
-        res.status(500).json({ error: err.message });
-    }
-});
-
-// DELETE item
-app.delete("/api/items/:id", async (req, res) => {
-    try {
-        const deletedItem = await Item.findByIdAndDelete(req.params.id);
-
-        if (!deletedItem) {
-            return res.status(404).json({ message: "Item not found" });
+        // simple validation
+        if (!name || !email || !password) {
+            return res.status(400).json({
+                message: "All fields are required"
+            });
         }
 
-        res.json({ message: "Deleted ✅" });
+        // for now direct success response
+        res.status(200).json({
+            message: "Signup successful ✅"
+        });
+
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        res.status(500).json({
+            message: err.message
+        });
     }
 });
 
-// ================= DATABASE =================
+// ✅ Login route
+router.post("/login", async (req, res) => {
+    try {
+        const { email, password } = req.body;
 
-// 🔥 USE ENV VARIABLE (NOT localhost)
-mongoose.connect(process.env.MONGO_URI)
-    .then(() => console.log("MongoDB Connected ✅"))
-    .catch(err => console.log(err));
+        if (!email || !password) {
+            return res.status(400).json({
+                message: "Email and password required"
+            });
+        }
 
-// ================= SERVER =================
+        res.status(200).json({
+            message: "Login successful ✅"
+        });
 
-const PORT = process.env.PORT || 5000;
-
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+    } catch (err) {
+        res.status(500).json({
+            message: err.message
+        });
+    }
 });
+
+module.exports = router;

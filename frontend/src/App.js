@@ -3,8 +3,8 @@ import axios from "axios";
 import { BrowserRouter as Router, Routes, Route, useNavigate } from "react-router-dom";
 import Dashboard from "./Dashboard";
 
-// 🔥 Backend URL from .env
-const BASE_URL = process.env.REACT_APP_API_URL;
+// ✅ Remove trailing slash if present
+const BASE_URL = process.env.REACT_APP_API_URL?.replace(/\/$/, "");
 
 function Auth() {
   const [isLogin, setIsLogin] = useState(false);
@@ -24,42 +24,35 @@ function Auth() {
     e.preventDefault();
 
     try {
+      let res;
+
       if (isLogin) {
-        const res = await axios.post(
-          `${BASE_URL}/api/users/login`,
-          {
-            email: form.email,
-            password: form.password
-          }
-        );
+        res = await axios.post(`${BASE_URL}/api/users/login`, {
+          email: form.email,
+          password: form.password
+        });
 
         alert(res.data.message);
         navigate("/dashboard");
-
       } else {
-        const res = await axios.post(
-          `${BASE_URL}/api/users/signup`,
-          form
-        );
-
+        res = await axios.post(`${BASE_URL}/api/users/signup`, form);
         alert(res.data.message);
       }
+
     } catch (err) {
-      alert(err.response?.data?.message || "Error");
+      console.error(err);
+      alert(err.response?.data?.message || "Something went wrong");
     }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-blue-500 to-purple-600">
-
       <div className="bg-white p-8 rounded-2xl shadow-xl w-[350px]">
-
         <h1 className="text-2xl font-bold text-center mb-6 text-gray-800">
           {isLogin ? "Welcome Back 👋" : "Create Account 🚀"}
         </h1>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-
           {!isLogin && (
             <input
               type="text"
@@ -67,6 +60,7 @@ function Auth() {
               placeholder="Enter Name"
               onChange={handleChange}
               className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+              required
             />
           )}
 
@@ -76,6 +70,7 @@ function Auth() {
             placeholder="Enter Email"
             onChange={handleChange}
             className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+            required
           />
 
           <input
@@ -84,9 +79,13 @@ function Auth() {
             placeholder="Enter Password"
             onChange={handleChange}
             className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+            required
           />
 
-          <button className="w-full bg-blue-500 text-white p-3 rounded-lg hover:bg-blue-600 transition">
+          <button
+            type="submit"
+            className="w-full bg-blue-500 text-white p-3 rounded-lg hover:bg-blue-600 transition"
+          >
             {isLogin ? "Login" : "Signup"}
           </button>
         </form>
@@ -101,7 +100,6 @@ function Auth() {
         >
           Switch to {isLogin ? "Signup" : "Login"}
         </button>
-
       </div>
     </div>
   );
