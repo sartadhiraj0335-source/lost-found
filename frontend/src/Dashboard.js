@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 
+const BASE_URL = process.env.REACT_APP_API_URL?.replace(/\/$/, "");
+
 function Dashboard() {
     const [items, setItems] = useState([]);
 
@@ -17,7 +19,7 @@ function Dashboard() {
 
     const fetchItems = async () => {
         try {
-            const res = await axios.get("http://localhost:5000/api/items");
+            const res = await axios.get(`${BASE_URL}/api/items`);
             setItems(res.data);
         } catch (err) {
             console.log(err);
@@ -30,7 +32,7 @@ function Dashboard() {
 
     const handleDelete = async (id) => {
         try {
-            await axios.delete(`http://localhost:5000/api/items/${id}`);
+            await axios.delete(`${BASE_URL}/api/items/${id}`);
             fetchItems();
         } catch (err) {
             console.log(err);
@@ -47,7 +49,7 @@ function Dashboard() {
         formData.append("image", form.image);
 
         try {
-            await axios.post("http://localhost:5000/api/items", formData);
+            await axios.post(`${BASE_URL}/api/items`, formData);
             fetchItems();
 
             setForm({
@@ -64,12 +66,12 @@ function Dashboard() {
     return (
         <div className="min-h-screen bg-gradient-to-br from-pink-100 via-purple-100 to-blue-100 relative overflow-hidden">
 
-            {/* 🌸 Decorative Background */}
+            {/* Decorative Background */}
             <div className="absolute top-10 left-10 w-40 h-40 bg-pink-300 opacity-30 rounded-full blur-3xl"></div>
             <div className="absolute bottom-10 right-10 w-52 h-52 bg-purple-300 opacity-30 rounded-full blur-3xl"></div>
             <div className="absolute top-1/2 left-1/3 w-32 h-32 bg-blue-300 opacity-20 rounded-full blur-2xl"></div>
 
-            {/* 🌸 NAVBAR */}
+            {/* Navbar */}
             <div className="bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 text-white p-4 shadow-lg flex justify-between items-center relative z-10">
                 <h1 className="text-xl font-bold tracking-wide">
                     🌸 Lost & Found Portal
@@ -77,7 +79,7 @@ function Dashboard() {
                 <p className="text-sm">Welcome 👋</p>
             </div>
 
-            {/* HEADER */}
+            {/* Header */}
             <div className="text-center mt-6 relative z-10">
                 <h2 className="text-3xl font-bold text-gray-800">
                     Dashboard
@@ -85,7 +87,7 @@ function Dashboard() {
                 <p className="text-gray-600">Manage lost & found items easily</p>
             </div>
 
-            {/* FORM */}
+            {/* Form */}
             <div className="backdrop-blur-md bg-white/70 p-6 rounded-2xl shadow-xl max-w-md mx-auto mt-6 border border-white/40 relative z-10">
                 <h3 className="text-lg font-semibold mb-4 text-purple-600">
                     Add New Item
@@ -132,7 +134,7 @@ function Dashboard() {
                 </form>
             </div>
 
-            {/* ITEMS GRID */}
+            {/* Items Grid */}
             <div className="grid md:grid-cols-3 gap-6 p-6 relative z-10">
                 {items.map((item) => (
                     <div
@@ -141,7 +143,7 @@ function Dashboard() {
                     >
                         {item.image && (
                             <img
-                                src={`http://localhost:5000/uploads/${item.image}`}
+                                src={`${BASE_URL}/uploads/${item.image}`}
                                 className="w-full h-40 object-cover"
                                 alt="item"
                             />
@@ -165,7 +167,7 @@ function Dashboard() {
                 ))}
             </div>
 
-            {/* FOOTER */}
+            {/* Footer */}
             <div className="bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 text-white text-center py-4 mt-6 relative z-10">
                 <p className="text-sm">© 2026 Lost & Found Portal</p>
                 <p className="text-xs mt-1">
