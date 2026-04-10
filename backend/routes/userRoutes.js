@@ -1,68 +1,29 @@
 const express = require("express");
 const router = express.Router();
-const User = require("../models/User");
-const bcrypt = require("bcryptjs");
 
-
-// 🔐 SIGNUP API
-router.post("/signup", async (req, res) => {
-    console.log("Signup API hit");
-
-    try {
-        const { name, email, password } = req.body;
-
-        // check if user already exists
-        const existingUser = await User.findOne({ email });
-        if (existingUser) {
-            return res.status(400).json({ message: "User already exists" });
-        }
-
-        // hash password
-        const hashedPassword = await bcrypt.hash(password, 10);
-
-        // create user
-        const user = new User({
-            name,
-            email,
-            password: hashedPassword
-        });
-
-        await user.save();
-
-        res.json({ message: "User registered successfully" });
-
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
+// ✅ test route
+router.get("/", (req, res) => {
+    res.send("User route working ✅");
 });
 
+// ✅ signup
+router.post("/signup", (req, res) => {
+    const { name, email, password } = req.body;
 
-// 🔐 LOGIN API
-router.post("/login", async (req, res) => {
-    console.log("Login API hit");
-
-    try {
-        const { email, password } = req.body;
-
-        // check user exists
-        const user = await User.findOne({ email });
-        if (!user) {
-            return res.status(400).json({ message: "User not found" });
-        }
-
-        // compare password
-        const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) {
-            return res.status(400).json({ message: "Invalid password" });
-        }
-
-        res.json({ message: "Login successful" });
-
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
+    res.status(200).json({
+        message: "Signup successful ✅",
+        user: { name, email }
+    });
 });
 
+// ✅ login
+router.post("/login", (req, res) => {
+    const { email, password } = req.body;
 
-// ✅ EXPORT ROUTER (VERY IMPORTANT)
+    res.status(200).json({
+        message: "Login successful ✅",
+        email
+    });
+});
+
 module.exports = router;

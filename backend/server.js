@@ -1,50 +1,29 @@
 const express = require("express");
 const router = express.Router();
 
-// ✅ Signup route
-router.post("/signup", async (req, res) => {
-    try {
-        const { name, email, password } = req.body;
-
-        // simple validation
-        if (!name || !email || !password) {
-            return res.status(400).json({
-                message: "All fields are required"
-            });
-        }
-
-        // for now direct success response
-        res.status(200).json({
-            message: "Signup successful ✅"
-        });
-
-    } catch (err) {
-        res.status(500).json({
-            message: err.message
-        });
-    }
+// Test route
+router.get("/", (req, res) => {
+    res.send("User route working ✅");
 });
 
-// ✅ Login route
-router.post("/login", async (req, res) => {
-    try {
-        const { email, password } = req.body;
+// Signup route
+router.post("/signup", (req, res) => {
+    const { name, email, password } = req.body;
 
-        if (!email || !password) {
-            return res.status(400).json({
-                message: "Email and password required"
-            });
-        }
+    res.status(200).json({
+        message: "Signup successful ✅",
+        user: { name, email }
+    });
+});
 
-        res.status(200).json({
-            message: "Login successful ✅"
-        });
+// Login route
+router.post("/login", (req, res) => {
+    const { email, password } = req.body;
 
-    } catch (err) {
-        res.status(500).json({
-            message: err.message
-        });
-    }
+    res.status(200).json({
+        message: "Login successful ✅",
+        email
+    });
 });
 
 module.exports = router;
